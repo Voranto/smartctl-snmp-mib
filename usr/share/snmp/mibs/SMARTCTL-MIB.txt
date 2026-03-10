@@ -13,11 +13,11 @@ IMPORTS
 		FROM HACKING-SNMP-MIB;
 
 smartCtlMIB MODULE-IDENTITY
-	LAST-UPDATED	"201902120000Z"
+	LAST-UPDATED	"202603100000Z"
 	ORGANIZATION	"Hacking Networked Solutions Ltd"
 	CONTACT-INFO	"Max Hacking"
 	DESCRIPTION		"This MIB module defines objects for HDD SMART data."
-	REVISION		"201902120000Z"
+	REVISION		"202603100000Z"
 	DESCRIPTION		"Derived from DISKIO-MIB ex UCD."
 	::= { smartCtl 1 }
 
@@ -50,7 +50,7 @@ smartCtlEntry OBJECT-TYPE
 	smartCtlDeviceUserCapacity				DisplayString,
 	smartCtlDeviceATAVersion				DisplayString,
 	smartCtlDeviceHealthOK					TruthValue,
-	smartCtlDeviceTemperatureCelsius		DisplayString,
+	smartCtlDeviceTemperatureCelsius		Gauge32,
 	smartCtlDeviceReallocatedSectorCt		Gauge32,
 	smartCtlDeviceCurrentPendingSector		Gauge32,
 	smartCtlDeviceOfflineUncorrectable		Gauge32,
@@ -61,7 +61,7 @@ smartCtlEntry OBJECT-TYPE
 	smartCtlDeviceFirmwareVersion			DisplayString,
 	smartCtlDeviceSSDLifeLeft				Gauge32,
 	smartCtlDevicePowerCycleCount			Gauge32,
-	smartCtlDevicePowerOnHours				DisplayString,
+	smartCtlDevicePowerOnHours				Gauge32,
 	smartCtlDeviceWWN                       DisplayString,
 	smartCtlDataUnitsRead                   Gauge32,
 	smartCtlDataUnitsWritten                Gauge32,
@@ -132,7 +132,7 @@ smartCtlDeviceTemperatureCelsius OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The current Temperature in degrees Celsius of this device. Example: '30&#176;C' (with &#176; being the temperature symbol)"
+	DESCRIPTION "The current Temperature in degrees Celsius of this device."
 	::= { smartCtlEntry 9 }
 
 smartCtlDeviceReallocatedSectorCt OBJECT-TYPE
@@ -211,7 +211,7 @@ smartCtlDevicePowerOnHours OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The current Power On Hours on this device. Example '120 hour(s)'"
+	DESCRIPTION "The current Power On Hours on this device."
 	::= { smartCtlEntry 20 }
 
 smartCtlDeviceWWN OBJECT-TYPE

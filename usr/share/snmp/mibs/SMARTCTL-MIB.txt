@@ -50,7 +50,7 @@ smartCtlEntry OBJECT-TYPE
 	smartCtlDeviceUserCapacity				DisplayString,
 	smartCtlDeviceATAVersion				DisplayString,
 	smartCtlDeviceHealthOK					TruthValue,
-	smartCtlDeviceTemperatureCelsius		Gauge32,
+	smartCtlDeviceTemperatureCelsius		DisplayString,
 	smartCtlDeviceReallocatedSectorCt		Gauge32,
 	smartCtlDeviceCurrentPendingSector		Gauge32,
 	smartCtlDeviceOfflineUncorrectable		Gauge32,
@@ -61,8 +61,16 @@ smartCtlEntry OBJECT-TYPE
 	smartCtlDeviceFirmwareVersion			DisplayString,
 	smartCtlDeviceSSDLifeLeft				Gauge32,
 	smartCtlDevicePowerCycleCount			Gauge32,
-	smartCtlDevicePowerOnHours				Gauge32
+	smartCtlDevicePowerOnHours				DisplayString,
+	smartCtlDeviceWWN                       DisplayString,
+	smartCtlDataUnitsRead                   Gauge32,
+	smartCtlDataUnitsWritten                Gauge32,
+	smartCtlAvailableSpare                  Gauge32,
+	smartCtlUnsafeShutdowns                 Gauge32,
+	smartCtlDeviceLifetimeUsedPercentage    Gauge32,
+	smartCtlDeviceHeliumLevel               Gauge32
 }
+
 
 smartCtlDeviceIndex OBJECT-TYPE
 	SYNTAX		Integer32 (0..65535)
@@ -70,47 +78,47 @@ smartCtlDeviceIndex OBJECT-TYPE
 	STATUS		current
 	DESCRIPTION "Reference index for each observed device."
 	::= { smartCtlEntry 1 }
-	
+
 smartCtlDeviceDev OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The path to the DEV entry for this device."
+	DESCRIPTION "The path to the DEV entry for this device. Example: '/dev/sda'"
 	::= { smartCtlEntry 2 }
-	
+
 smartCtlDeviceModelFamily OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The Model Family string for this device."
+	DESCRIPTION "The Model Family string for this device. Example: 'Seagate Surveillance'"
 	::= { smartCtlEntry 3 }
 
 smartCtlDeviceDeviceModel OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The Device Model string for this device."
+	DESCRIPTION "The Device Model string for this device. Example: 'ST1000VX000-1ES162'"
 	::= { smartCtlEntry 4 }
-	
+
 smartCtlDeviceSerialNumber OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The Serial Number for this device."
+	DESCRIPTION "The Serial Number for this device. Example: 'Z4YE26AA'"
 	::= { smartCtlEntry 5 }
-	
+
 smartCtlDeviceUserCapacity OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The User Capacity for this device."
+	DESCRIPTION "The User Capacity for this device in bytes. Example: '1,000,204,886,016 bytes'"
 	::= { smartCtlEntry 6 }
 
 smartCtlDeviceATAVersion OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The ATA Version supported by this device."
+	DESCRIPTION "The ATA Version supported by this device. Example: 'ACS-2, ACS-3 T13/2161-D revision 3b'"
 	::= { smartCtlEntry 7 }
 
 smartCtlDeviceHealthOK OBJECT-TYPE
@@ -121,31 +129,31 @@ smartCtlDeviceHealthOK OBJECT-TYPE
 	::= { smartCtlEntry 8 }
 
 smartCtlDeviceTemperatureCelsius OBJECT-TYPE
-	SYNTAX		Gauge32
+	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The current Temperature in degrees Celsius of this device."
+	DESCRIPTION "The current Temperature in degrees Celsius of this device. Example: '30&#176;C' (with &#176; being the temperature symbol)"
 	::= { smartCtlEntry 9 }
 
 smartCtlDeviceReallocatedSectorCt OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The number of Reallocated Sectors on this device."
+	DESCRIPTION "The number of Reallocated Sectors on this device. A value other than zero may indicate device failure. "
 	::= { smartCtlEntry 10 }
 
 smartCtlDeviceCurrentPendingSector OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The number of Current Pending Sectors on this device."
+	DESCRIPTION "The number of Current Pending Sectors on this device. A value other than zero may indicate device failure."
 	::= { smartCtlEntry 11 }
-	
+
 smartCtlDeviceOfflineUncorrectable OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The number of Off-line Uncorrectable Sectors on this device."
+	DESCRIPTION "The number of Off-line Uncorrectable Sectors on this device. A value other than zero may indicate device failure."
 	::= { smartCtlEntry 12 }
 
 smartCtlDeviceUDMACRCErrorCount OBJECT-TYPE
@@ -159,28 +167,30 @@ smartCtlDeviceReadErrorRate OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The current Read Error Rate on this device."
+	DESCRIPTION "The current Read Error Rate on this device, normalized. Represents a value between 0 and 255, with 0 being the worst condition,
+	            and 255 being the best condition. Most manufacturers use 100 or 200 as a best value."
 	::= { smartCtlEntry 14 }
 
 smartCtlDeviceSeekErrorRate OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The current Seek Error Rate on this device."
+	DESCRIPTION "The current Seek Error Rate on this device, normalized. Represents a value between 0 and 255, with 0 being the worst condition,
+	            and 255 being the best condition. Most manufacturers use 100 or 200 as a best value."
 	::= { smartCtlEntry 15 }
 
 smartCtlDeviceHardwareECCRecovered OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The current Hardware ECC Recovered Count on this device."
+	DESCRIPTION "The count of errors that could not be recovered using hardware ECC. A value other than zero may indicate device failure. "
 	::= { smartCtlEntry 16 }
 
 smartCtlDeviceFirmwareVersion OBJECT-TYPE
 	SYNTAX DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The current Firmware Version installed on this device."
+	DESCRIPTION "The current Firmware Version installed on this device. Example: 'CV27'"
 	::= { smartCtlEntry 17 }
 
 smartCtlDeviceSSDLifeLeft OBJECT-TYPE
@@ -198,11 +208,64 @@ smartCtlDevicePowerCycleCount OBJECT-TYPE
 	::= { smartCtlEntry 19 }
 
 smartCtlDevicePowerOnHours OBJECT-TYPE
-	SYNTAX		Gauge32
+	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION "The current Power On Hours on this device."
+	DESCRIPTION "The current Power On Hours on this device. Example '120 hour(s)'"
 	::= { smartCtlEntry 20 }
+
+smartCtlDeviceWWN OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "Logical Unit WWN Device Identifier for this device. Example: '5000c50092525886'"
+	::= { smartCtlEntry 21 }
+
+smartCtlDataUnitsRead OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data units read for this device in Gigabytes. A value of 1 represents 2^30 Bytes"
+    ::= { smartCtlEntry 22 }
+
+smartCtlDataUnitsWritten OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data units written for this device in Gigabytes. A value of 1 represents 2^30 Bytes."
+    ::= { smartCtlEntry 23 }
+
+smartCtlAvailableSpare OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Percentage of the spare sectors still available
+                for this device. A low value may indicate that the device is failing."
+    ::= { smartCtlEntry 24 }
+
+smartCtlUnsafeShutdowns OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Unsafe shutdown count for this device"
+    ::= { smartCtlEntry 25 }
+
+smartCtlDeviceLifetimeUsedPercentage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Percentage used of the lifetime of the device. A value of 100 indicates that
+                 the device has reached its theoretical end of life, not that has malfunctioned. The value may go up
+                 to 255."
+    ::= { smartCtlEntry 26 }
+
+smartCtlDeviceHeliumLevel OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Value from 0 to 100 representing the helium level of the device. 100 is the ideal value
+                 0 is the worst possible value"
+    ::= { smartCtlEntry 27 }
 
 -- Conformance information ******************************************
 
